@@ -1,0 +1,6 @@
+.env
+input/
+output/
+main_updated.log
+main_updated.pdf
+__pycache__/
