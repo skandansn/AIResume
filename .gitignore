@@ -1,5 +1,6 @@
 .env
-input/
+input/resume_data.py
+input/main.tex
 output/
 main_updated.log
 main_updated.pdf
