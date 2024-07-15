@@ -14,7 +14,9 @@ def update_resume_for_job_description(content):
     projects1 = get_named_section_from_ai_response(projects, "projects1:", "projects2:")
     projects2 = get_named_section_from_ai_response(projects, "projects2:", "ProjectsSectionEnd")
 
-    write_to_tex_file_from_job_description(skills, sde, sdei, projects1, projects2)
+    sections = [skills, sde, sdei, projects1, projects2]
+
+    write_to_tex_file_from_job_description(sections)
     return True
 
 def post_process_ai_response(content):
@@ -36,54 +38,38 @@ def get_named_section_from_ai_response(content, start, end):
     
     return named_section
 
-def write_to_tex_file_from_job_description(skills, sde, sdei, projects1, projects2):
+def append_new_items_to_section_parent(section, new_items):
+    for new_item in new_items:
+        if new_item == "" or new_item == " " or new_item == "\n":
+            continue
+        item_tag = TexSoup(f'\\item {new_item}')
+        section.parent.append(item_tag)
+    
+
+def write_to_tex_file_from_job_description(sections):
     with open('app/inputFiles/whole_resume.tex', 'r') as file:
         resume_tex = file.read()
     
     soup = TexSoup(resume_tex)
     
     all_labels = soup.find_all('label')
-
     skills_section_position = all_labels[0].position
-
     skills_section_position = soup.char_pos_to_line(skills_section_position)[0]
 
-    for skill in skills:
-        if skill == "" or skill == " " or skill == "\n":
+    for skill in sections[0]:
+        if skill == "" or skill == " " or skill == "\n" or len(skill.split(":")) < 2:
             continue
+        
         skill_name = skill.split(":")[0]
         skill_values = skill.split(":")[1]
         item_tag = TexSoup(f'\\textbf{{{skill_name}:}} {skill_values} \\\\')
         soup.document.insert(skills_section_position-20, item_tag)
         skills_section_position += 1
     
-    for new_item in sde:
-        if new_item == "" or new_item == " " or new_item == "\n":
-            continue
-        item_tag = TexSoup(f'\\item {new_item}')
-        all_labels[1].parent.append(item_tag)
-    
-    for new_item in sdei:
-        if new_item == "" or new_item == " " or new_item == "\n":
-            continue
-        item_tag = TexSoup(f'\\item {new_item}')
-        all_labels[2].parent.append(item_tag)
-    
-    for new_item in projects1:
-        if new_item == "" or new_item == " " or new_item == "\n":
-            continue
-        item_tag = TexSoup(f'\\item {new_item}')
-        all_labels[3].parent.append(item_tag)
-    
-    for new_item in projects2:
-        if new_item == "" or new_item == " " or new_item == "\n":
-            continue
-        item_tag = TexSoup(f'\\item {new_item}')
-        all_labels[4].parent.append(item_tag)
-    
+    for label in all_labels[1:]:
+        append_new_items_to_section_parent(label, sections[all_labels.index(label)])
    
     updated_content = str(soup)
-
     updated_content_lines = updated_content.split("\n")
 
     for i in range(27):

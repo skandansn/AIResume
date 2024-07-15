@@ -1,7 +1,5 @@
 .env
-input/resume_data.py
-input/main.tex
-output/
-main_updated.log
-main_updated.pdf
+app/inputFiles/resume_data.py
+app/inputFiles/whole_resume.tex
+app/outputFiles/
 __pycache__/

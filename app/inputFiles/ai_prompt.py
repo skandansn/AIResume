@@ -14,9 +14,9 @@ inject_keywords_into_resume_prompt = """
     You will need to do the following things.
     i) Read and understand my resume data.
     ii) Among the key words given, find the important key words that are missing in my resume.
-    iii) Add those key words in the resume in such a way that my resume has all those important missing key words explictly mentioned, spread out throughout skills, experience and projects sections.
+    iii) Add those key words in the resume in such a way that my resume has all those important missing key words explictly mentioned, spread out throughout SkillsSection, sde, sdei and projects1, projects2 sections.
+    iv) Try to add the keywords as part of an existing sentence or bullet point in the resume. If you cannot find a suitable place to add the keyword, add a new bullet point with the keyword.
     Make sure to add each keyword only once.
-    You are only a top level editor if you do not change the format of the resume. Do not add any other formatting or bold or *text* or **text** or italic to the final text.
     Give me the final updated resume which has the key words added in the same format as the input.
 
     The key words are given below: \n
