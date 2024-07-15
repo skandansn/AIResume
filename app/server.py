@@ -10,4 +10,4 @@ def read_root():
 
 @app.post("/keywordsInjections/jobDescription")
 def job_description_injections(input: input_models.JobDescription):
-    return generate_keywords_matched_resume(input.description)
+    return generate_keywords_matched_resume(input.description, input.keywords)
