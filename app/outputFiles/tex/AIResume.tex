@@ -1,0 +1,102 @@
+\documentclass[11pt]{article}       % set main text size
+\usepackage[a4paper,                % set paper size to A4. change to letterpaper for US/Canadian resumes
+top=0.5in,                          % specify top page margin
+bottom=0.5in,                       % specify bottom page margin
+left=0.5in,                         % specify left page margin
+right=0.5in]{geometry}              % specify right page margin
+                     
+\usepackage{XCharter}               % set font
+\usepackage[T1]{fontenc}            % output encoding
+\usepackage[utf8]{inputenc}         % input encoding
+\usepackage{enumitem}               % enable lists for bullet points: itemize and \item
+\usepackage[hidelinks]{hyperref}    % format hyperlinks
+\usepackage{titlesec}               % enable section title customization
+\raggedright                        % disable text justification
+\pagestyle{empty}                   % disable page numbering
+
+% ensure PDF output will be all-Unicode and machine-readable
+\input{glyphtounicode}
+\pdfgentounicode=1
+
+% format section headings: bolding, size, white space above and below
+\titleformat{\section}{\bfseries\large}{}{0pt}{}[\vspace{1pt}\titlerule\vspace{-6.5pt}]
+
+% format bullet points: size, white space above and below, white space between bullets
+\renewcommand\labelitemi{$\vcenter{\hbox{\small$\bullet$}}$}
+\setlist[itemize]{itemsep=-2pt, leftmargin=12pt}
+
+% resume starts here
+\begin{document}
+
+% name
+\centerline{\Huge Skandan Senthil Nathan}
+
+\vspace{5pt}
+
+% contact information
+\centerline{\href{mailto:skandansenthilnathan@gmail.com}{skandansenthilnathan@gmail.com} | \href{https://www.linkedin.com/in/skandansn/}{linkedin.com/in/skandansn} | \href{https://github.com/skandansn}{github.com/skandansn}}
+
+\vspace{-10pt}
+
+% skills section
+\section*{Skills}
+\textbf{Languages:}  Python, Java, PHP, Go, JavaScript, SQL (MySQL) \\\textbf{Frameworks:}  FastAPI, Django, Laravel, Node.js, React, Flutter, Next.js  \\\textbf{Developer Infrastructure:}  AWS, Docker, Git, Firebase, NoSQL, Redis, Kubernetes \\\textbf{Certifications:}  AWS Academy Cloud Foundations, AWS Academy Cloud Architecting \\\label{skillsSection}
+
+
+\vspace{-6.5pt}
+
+% experience section
+\section*{Experience}
+\textbf{Software Development Engineer,} \href{https://razorpay.com/}{Razorpay} -- Bangalore, India \hfill July 2022 -- July 2023 \\
+\vspace{-9pt}
+\begin{itemize}
+  \label{sde}
+  
+\item Honored with the ``Rookie MVP Award'' for innovative contributions and initiatives, including increasing the payment success rate by 10\% and developing robust tech specs and products in 2022-2023.\item Drove the test-driven development of end-to-end features and REST APIs across PHP, Go, Python, and Java microservices to enhance card and UPI recurring payment methods, impacting over 100,000 users.\item Elevated system reliability by implementing PagerDuty alerting functionality and Prometheus monitoring dashboards, resulting in a 20\% reduction in payment downtime detection and resolution.\item Facilitated seamless collaboration among 2 agile internal teams and 2 external vendors, resulting in the successful execution of 10 projects within timelines, showcasing strong communication skills.\end{itemize}
+
+\textbf{Software Development Engineer Intern,} \href{https://razorpay.com/}{Razorpay} -- Bangalore, India \hfill Jan 2022 -- July 2022 \\
+\vspace{-9pt}
+\begin{itemize}
+  \label{sdei}
+
+\item Drove the setup of new cron jobs for charging various types of subscriptions, optimizing subscription management processes, and increasing revenue by 5\%.\item Amplified unit test and integration test coverage of the Razorpay Subscriptions product by 15\% through the creation of automated PHPUnit and JUnit tests, enhancing product stability and reducing bug occurrences.\item Engineered automation scripts and APIs, notably facilitating payment method changes within Razorpay Subscriptions, reducing subscription cancellations and customer support queries by 10\%.\end{itemize}
+
+% \textbf{Job Title,} \href{https://www.fstl1992.com/}{Company} -- City, ST \hfill XXXX -- XXXX \\
+% \vspace{-9pt}
+
+\vspace{-18.5pt}
+
+% projects section
+\section*{Projects}
+\textbf{Leave Application Management} \hfill \href{https://github.com/skandansn/AOML}{github.com/skandansn/AOML} \\
+\vspace{-9pt}
+\begin{itemize}
+  \label{projects1}
+
+\item Created a cross-platform application using Flutter and Firebase that enables students to apply for OD, ML, and leave online, and allows faculties to approve or deny applications.\item Hosted the application as a web app on Google Cloud and published it as an Android app on the Google Play Store.\end{itemize}
+
+\textbf{ApnaLawyer} \hfill \href{https://github.com/skandansn/apnaLawyer}{github.com/skandansn/apnaLawyer} \\
+\vspace{-9pt}
+\begin{itemize}
+  \label{projects2}
+
+\item Leveraged FastAPI, LangChain, Pinecone, and Postgres to construct a scalable and efficient backend infrastructure, delivering swift responses to user queries.\item Designed and implemented an innovative LLM chatbot tailored for Indian law, supporting features like document-based query answering and audio input for legal inquiries.\item Developed a robust search infrastructure powered by OpenSearch for efficient retrieval of legal documents.\end{itemize}
+
+\vspace{-18.5pt}
+
+% education section
+\section*{Education}
+\textbf{\href{https://www.northeastern.edu/}{Northeastern University, Boston, MA }} \hfill Expected Dec 2024 \\
+Master of Science in Computer Science \hfill GPA: 3.92/4.0 \\
+
+\textbf{\href{https://www.amrita.edu/}{Amrita Vishwa Vidyapeetham, Coimbatore, India}} \hfill May 2022 \\
+Bachelor of Technology in Computer Science and Engineering \hfill GPA: 8.28/10.0 \\
+
+% awards section
+\section*{Awards and Publications}
+\begin{itemize}
+  \item Awarded the ``Bravo SPOT Award'' by Razorpay for the development and execution of a crucial government initiative (NPCI OC101) concerning the identification of the ultimate beneficiary in P2M payments.
+  \item Published a technical paper titled \href{https://link.springer.com/chapter/10.1007/978-981-19-1677-9_44}{``A Secured Blockchain Based Facial Recognition System for Two Factor Authentication Process''} in Springer (April 2022).  
+\end{itemize}
+
+\end{document}
