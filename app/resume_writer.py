@@ -3,9 +3,6 @@ from pdflatex import PDFLaTeX
 
 def update_resume_for_job_description(content):
     content = post_process_ai_response(content)
-    # skills, experience, projects = seperate_sections_from_ai_response(content)
-    # projects1, projects2 = seperate_projects_from_projects_section(projects)
-    # sde, sdei = seperate_experience_from_experience_section(experience)
 
     skills = get_named_section_from_ai_response(content, "SkillsSectionStart", "SkillsSectionEnd")
     experience = get_named_section_from_ai_response(content, "ExperienceSectionStart", "ExperienceSectionEnd")
@@ -39,59 +36,6 @@ def get_named_section_from_ai_response(content, start, end):
     
     return named_section
 
-# def seperate_sections_from_ai_response(content):
-#     skills = []
-#     experience = []
-#     projects = []
-#     content = content.split("\n")
-#     while len(content) > 0 and "SkillsSectionStart" not in content[0]:
-#         content.pop(0)
-#     content.pop(0)
-#     while len(content) > 0 and "SkillsSectionEnd" not in content[0]:
-#         skills.append(content.pop(0))
-#     content.pop(0)
-#     while len(content) > 0 and "ExperienceSectionStart" not in content[0]:
-#         content.pop(0)
-#     content.pop(0)
-#     while len(content) > 0 and "ExperienceSectionEnd" not in content[0]:
-#         experience.append(content.pop(0))
-#     content.pop(0)
-#     while len(content) > 0 and "ProjectsSectionStart" not in content[0]:
-#         content.pop(0)
-#     content.pop(0)
-#     while len(content) > 0 and "ProjectsSectionEnd" not in content[0]:
-#         projects.append(content.pop(0))
-
-#     return skills, experience, projects
-
-# def seperate_projects_from_projects_section(projects):
-#     projects1 = []
-#     projects2 = []
-#     while len(projects) > 0 and "projects1:" not in projects[0]:
-#         projects.pop(0)
-#     projects.pop(0)
-#     while len(projects) > 0 and "projects2:" not in projects[0]:
-#         projects1.append(projects.pop(0))
-#     projects.pop(0)
-#     while len(projects) > 0:
-#         projects2.append(projects.pop(0))
-    
-#     return projects1, projects2
-
-# def seperate_experience_from_experience_section(experience):
-#     sde = []
-#     sdei = []
-#     while len(experience) > 0 and "sde:" not in experience[0]:
-#         experience.pop(0)
-#     experience.pop(0)
-#     while len(experience) > 0 and "sdei:" not in experience[0]:
-#         sde.append(experience.pop(0))
-#     experience.pop(0)
-#     while len(experience) > 0:
-#         sdei.append(experience.pop(0))
-    
-#     return sde, sdei
-
 def write_to_tex_file_from_job_description(skills, sde, sdei, projects1, projects2):
     with open('app/inputFiles/whole_resume.tex', 'r') as file:
         resume_tex = file.read()
@@ -109,7 +53,6 @@ def write_to_tex_file_from_job_description(skills, sde, sdei, projects1, project
             continue
         skill_name = skill.split(":")[0]
         skill_values = skill.split(":")[1]
-        # have skill name in bold and skill values in normal and after that add // for new line
         item_tag = TexSoup(f'\\textbf{{{skill_name}:}} {skill_values} \\\\')
         soup.document.insert(skills_section_position-20, item_tag)
         skills_section_position += 1
@@ -163,4 +106,3 @@ def write_to_pdf():
     
     with open('app/outputFiles/pdf/AIResume.pdf', 'wb') as file:
         file.write(pdf)
-    
