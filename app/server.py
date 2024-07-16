@@ -10,4 +10,9 @@ def read_root():
 
 @app.post("/keywordsInjections/jobDescription")
 def job_description_injections(input: input_models.JobDescription):
-    return generate_keywords_matched_resume(input.description, input.keywords)
+    if input.keywords.mandatory_keywords is None and input.keywords.optional_keywords == False:
+        return "Please provide at least keywords.mandatory_keywords or set keywords.optional_keywords to true"
+    if input.resume_name == "":
+        return "Please provide a resume name"
+    return generate_keywords_matched_resume(input.description, input.keywords, input.resume_name)
+    

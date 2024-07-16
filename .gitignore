@@ -1,5 +1,5 @@
 .env
 app/inputFiles/resume_data.py
-app/inputFiles/whole_resume.tex
+app/inputFiles/resume_tex_templates/
 app/outputFiles/
 __pycache__/

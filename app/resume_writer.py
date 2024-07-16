@@ -1,7 +1,7 @@
 from TexSoup import TexSoup
 from pdflatex import PDFLaTeX
 
-def update_resume_for_job_description(content):
+def update_resume_for_job_description(content, resume_name):
     content = post_process_ai_response(content)
 
     skills = get_named_section_from_ai_response(content, "SkillsSectionStart", "SkillsSectionEnd")
@@ -16,7 +16,7 @@ def update_resume_for_job_description(content):
 
     sections = [skills, sde, sdei, projects1, projects2]
 
-    write_to_tex_file_from_job_description(sections)
+    write_to_tex_file_from_job_description(sections, resume_name)
     return True
 
 def post_process_ai_response(content):
@@ -46,8 +46,8 @@ def append_new_items_to_section_parent(section, new_items):
         section.parent.append(item_tag)
     
 
-def write_to_tex_file_from_job_description(sections):
-    with open('app/inputFiles/whole_resume.tex', 'r') as file:
+def write_to_tex_file_from_job_description(sections, resume_name):
+    with open(f'app/inputFiles/resume_tex_templates/{resume_name}.tex', 'r') as file:
         resume_tex = file.read()
     
     soup = TexSoup(resume_tex)
@@ -77,16 +77,16 @@ def write_to_tex_file_from_job_description(sections):
 
     updated_content = "\n".join(updated_content_lines)
 
-    with open('app/outputFiles/tex/AIResume.tex', 'w') as file:
+    with open(f'app/outputFiles/tex/{resume_name}.tex', 'w') as file:
         file.write(updated_content)
     
-    write_to_pdf()
+    write_to_pdf(resume_name)
 
     return True
     
 
-def write_to_pdf():
-    pdfl = PDFLaTeX.from_texfile('app/outputFiles/tex/AIResume.tex')
+def write_to_pdf(resume_name):
+    pdfl = PDFLaTeX.from_texfile(f'app/outputFiles/tex/{resume_name}.tex')
     pdfl.set_interaction_mode()
     pdf, log, completed_process = pdfl.create_pdf(keep_pdf_file=False, keep_log_file=False)
     
