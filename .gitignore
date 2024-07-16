@@ -1,6 +1,6 @@
 .env
 app/inputFiles/resume_data.py
-app/inputFiles/resume_tex_templates/
+app/inputFiles/resume_tex_templates/*
 app/outputFiles/
 __pycache__/
 
