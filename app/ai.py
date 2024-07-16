@@ -7,7 +7,7 @@ from resume_writer import update_resume_for_job_description
 
 def call_ai_and_get_response_text(prompt):
     genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    model = genai.GenerativeModel('gemini-1.5-pro')
     response = model.generate_content(prompt)
     return response.text
 
