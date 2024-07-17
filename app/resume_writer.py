@@ -1,5 +1,6 @@
 from TexSoup import TexSoup
 from pdflatex import PDFLaTeX
+import os
 
 def update_resume_for_job_description(content, resume_name):
     content = post_process_ai_response(content)
@@ -90,5 +91,6 @@ def write_to_pdf(resume_name):
     pdfl.set_interaction_mode()
     pdf, log, completed_process = pdfl.create_pdf(keep_pdf_file=False, keep_log_file=False)
     
-    with open('app/outputFiles/pdf/AIResume.pdf', 'wb') as file:
+    output_name = os.environ["OUTPUT_RESUME_NAME"]
+    with open(f'app/outputFiles/pdf/{output_name}.pdf', 'wb') as file:
         file.write(pdf)
