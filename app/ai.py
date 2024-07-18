@@ -22,6 +22,9 @@ def generate_keywords_matched_resume(description, input_keywords, resume_name):
         else:
             other_keywords = "These keywords are also important and so, try to add them in the resume: " + keywords + "\n"
             keywords = must_keywords + other_keywords
+    if input_keywords.ignore_keywords is not None:
+        ignore_keywords = "I do not possess these particular skills. So always ignore these keywords: " + input_keywords.ignore_keywords + "\n"
+        keywords = keywords + ignore_keywords
     prompt = ai_prompts.inject_keywords_into_resume_prompt + keywords + resume_data.whole_resume_data 
     response = call_ai_and_get_response_text(prompt)
     return update_resume_for_job_description(response, resume_name)

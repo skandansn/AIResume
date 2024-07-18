@@ -4,6 +4,7 @@ from typing import Optional
 class Keywords(BaseModel):
     optional_keywords : bool = True
     mandatory_keywords : Optional[str] = None
+    ignore_keywords : Optional[str] = None
 
 class JobDescription(BaseModel):
     description : str
