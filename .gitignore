@@ -3,6 +3,7 @@ app/inputFiles/resume_data.py
 app/inputFiles/resume_tex_templates/*
 app/outputFiles/
 __pycache__/
+.venv
 
 #do not ignore files
 !app/inputFiles/resume_tex_templates/sample_resume.tex

@@ -1,13 +1,12 @@
-import os
 import google.generativeai as genai
 from inputFiles import ai_prompt as ai_prompts
 from inputFiles import resume_data as resume_data
 from resume_writer import update_resume_for_job_description
-
+from config.app_configs import settings
 
 def call_ai_and_get_response_text(prompt):
-    genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-    model = genai.GenerativeModel('gemini-1.5-pro')
+    genai.configure(api_key=settings.gemini_api_key)
+    model = genai.GenerativeModel('gemini-1.5-flash')
     response = model.generate_content(prompt)
     return response.text
 
