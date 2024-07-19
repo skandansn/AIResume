@@ -39,6 +39,7 @@ pydantic-settings==2.3.4
 pydantic_core==2.20.1
 Pygments==2.18.0
 pyparsing==3.1.2
+python-dotenv==1.0.1
 python-multipart==0.0.9
 PyYAML==6.0.1
 requests==2.32.3

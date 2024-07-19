@@ -6,7 +6,7 @@ from config.app_configs import settings
 
 def call_ai_and_get_response_text(prompt):
     genai.configure(api_key=settings.gemini_api_key)
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    model = genai.GenerativeModel('gemini-1.5-pro')
     response = model.generate_content(prompt)
     return response.text
 

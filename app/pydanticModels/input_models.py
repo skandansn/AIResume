@@ -8,6 +8,6 @@ class Keywords(BaseModel):
 
 class JobDescription(BaseModel):
     description : str
-    keywords : Optional[Keywords] = None
+    keywords : Keywords
     resume_name : Optional[str] = "whole_resume"
 
