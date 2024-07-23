@@ -2,6 +2,6 @@
 app/config/*secret*.json
 __pycache__/
 .venv
-
+app/inputFiles/resume_tex_templates
 #do not ignore files
 !app/inputFiles/resume_tex_templates/sample_resume.tex
