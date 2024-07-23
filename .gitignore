@@ -1,7 +1,5 @@
 .env
-app/inputFiles/resume_data.py
-app/inputFiles/resume_tex_templates/*
-app/outputFiles/
+app/config/*secret*.json
 __pycache__/
 .venv
 

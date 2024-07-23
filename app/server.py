@@ -1,18 +1,63 @@
 import fastapi
+from typing import Annotated
+from fastapi import Depends, UploadFile, File
 import pydanticModels.input_models as input_models
 from ai import generate_keywords_matched_resume
+from account import sign_up_with_email_and_password, sign_in_with_email_and_password, update_output_resume_name, update_resume_content, get_user_data, update_input_tex
+from fastapi.middleware.cors import CORSMiddleware
+from middleware.authentication_middleware import get_firebase_user_from_token
+
 
 app = fastapi.FastAPI()
+
+origins = [
+    "http://localhost",
+    "http://localhost:3000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def read_root():
     return {"Automated Resume Parser is running!"}
 
 @app.post("/keywordsInjections/jobDescription")
-def job_description_injections(input: input_models.JobDescription):
+def job_description_injections(user: Annotated[dict, Depends(get_firebase_user_from_token)], input: input_models.JobDescription):
     if input.keywords.mandatory_keywords is None and input.keywords.optional_keywords == False:
         return "Please provide at least keywords.mandatory_keywords or set keywords.optional_keywords to true"
     if input.resume_name == "":
         return "Please provide a resume name"
-    return generate_keywords_matched_resume(input.description, input.keywords, input.resume_name)
-    
+    return generate_keywords_matched_resume(user.get("user_id"), input.description, input.keywords, input.resume_name)
+
+@app.post("/signUp")
+def sign_up(input: input_models.SignUp):
+    return sign_up_with_email_and_password(input.email, input.password)
+
+@app.post("/signIn")
+def sign_in(input: input_models.SignUp):
+    return sign_in_with_email_and_password(input.email, input.password)
+
+@app.post("/account/updateOutputResumeName")
+def output_resume_name_update(user: Annotated[dict, Depends(get_firebase_user_from_token)], resume_name: input_models.UpdateResumeName):
+    return update_output_resume_name(user, resume_name.resume_name)
+
+@app.post("/account/updateResumeContent")
+def resume_content_update(user: Annotated[dict, Depends(get_firebase_user_from_token)], resume_content: input_models.ResumeContent):
+    return update_resume_content(user, resume_content.resume_content)
+
+@app.post("/account/updateInputTex")
+async def input_tex_update(user: Annotated[dict, Depends(get_firebase_user_from_token)], input_tex: UploadFile = File(...)):
+    file = {}
+    file["filename"] = input_tex.filename
+    file["content"] = await input_tex.read()
+    return update_input_tex(user, file)
+
+@app.get("/account")
+def account_info(user: Annotated[dict, Depends(get_firebase_user_from_token)]):
+    return get_user_data(user)

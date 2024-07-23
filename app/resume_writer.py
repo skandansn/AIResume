@@ -1,8 +1,10 @@
 from TexSoup import TexSoup
 from pdflatex import PDFLaTeX
 from config.app_configs import settings
+from firebase_utils import firebase_upload_file, firebase_download_file_url
+import httpx 
 
-def update_resume_for_job_description(content, resume_name):
+def update_resume_for_job_description(content, resume_names):
     content = post_process_ai_response(content)
 
     skills = get_named_section_from_ai_response(content, "SkillsSectionStart", "SkillsSectionEnd")
@@ -17,8 +19,7 @@ def update_resume_for_job_description(content, resume_name):
 
     sections = [skills, sde, sdei, projects1, projects2]
 
-    write_to_tex_file_from_job_description(sections, resume_name)
-    return True
+    return write_to_tex_file_from_job_description(sections, resume_names)
 
 def post_process_ai_response(content):
     #remove any occurrences of * or **
@@ -47,11 +48,14 @@ def append_new_items_to_section_parent(section, new_items):
         section.parent.append(item_tag)
     
 
-def write_to_tex_file_from_job_description(sections, resume_name):
-    with open(f'app/inputFiles/resume_tex_templates/{resume_name}.tex', 'r') as file:
-        resume_tex = file.read()
+def write_to_tex_file_from_job_description(sections, resume_names):
+    tex_file_name = resume_names["tex_file_name"]
+
+    resume_tex_url = firebase_download_file_url(f'{resume_names["user_id"]}/{tex_file_name}.tex')
+
+    resume_tex = httpx.get(resume_tex_url)
     
-    soup = TexSoup(resume_tex)
+    soup = TexSoup(resume_tex.text)
     
     all_labels = soup.find_all('label')
     skills_section_position = all_labels[0].position
@@ -78,19 +82,19 @@ def write_to_tex_file_from_job_description(sections, resume_name):
 
     updated_content = "\n".join(updated_content_lines)
 
-    with open(f'app/outputFiles/tex/{resume_name}.tex', 'w') as file:
-        file.write(updated_content)
+    updated_content = updated_content.encode('utf-8')
     
-    write_to_pdf(resume_name)
-
-    return True
+    return write_to_pdf(updated_content, resume_names)
     
 
-def write_to_pdf(resume_name):
-    pdfl = PDFLaTeX.from_texfile(f'app/outputFiles/tex/{resume_name}.tex')
+def write_to_pdf(content, resume_names):
+    pdfl = PDFLaTeX.from_binarystring(content, resume_names["output_resume_name"])
     pdfl.set_interaction_mode()
     pdf, log, completed_process = pdfl.create_pdf(keep_pdf_file=False, keep_log_file=False)
     
-    output_name = settings.output_resume_name
-    with open(f'app/outputFiles/pdf/{output_name}.pdf', 'wb') as file:
-        file.write(pdf)
+    output_name = resume_names["output_resume_name"]
+    
+    return firebase_upload_file(pdf, f'{resume_names["user_id"]}/{output_name}.pdf')
+    
+
+
