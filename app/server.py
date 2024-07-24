@@ -2,17 +2,18 @@ import fastapi
 from typing import Annotated
 from fastapi import Depends, UploadFile, File
 import pydanticModels.input_models as input_models
+from starlette.responses import JSONResponse
 from ai import generate_keywords_matched_resume
-from account import sign_up_with_email_and_password, sign_in_with_email_and_password, update_output_resume_name, update_resume_content, get_user_data, update_input_tex, get_tex_files
+from account import get_output_resume_link, sign_up_with_email_and_password, sign_in_with_email_and_password, update_output_resume_name, update_resume_content, get_user_data, update_input_tex, get_tex_files
 from fastapi.middleware.cors import CORSMiddleware
 from middleware.authentication_middleware import get_firebase_user_from_token
-
+from middleware.logging_middleware import LoggingMiddleware
+from middleware.exception_handling_middleware import ExceptionHandlingMiddleware
 
 app = fastapi.FastAPI()
 
 origins = [
-    "http://localhost",
-    "http://localhost:3000",
+    "http://localhost:3000"
 ]
 
 app.add_middleware(
@@ -22,6 +23,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.add_middleware(LoggingMiddleware)
+
+app.add_middleware(ExceptionHandlingMiddleware)
 
 @app.get("/")
 def read_root():
@@ -36,12 +41,23 @@ def job_description_injections(user: Annotated[dict, Depends(get_firebase_user_f
     return generate_keywords_matched_resume(user.get("user_id"), input.description, input.keywords, input.resume_name)
 
 @app.post("/signUp")
-def sign_up(input: input_models.SignUp):
-    return sign_up_with_email_and_password(input.email, input.password)
+def sign_up(input: input_models.SignUp, response: fastapi.Response):
+    user = sign_up_with_email_and_password(input.email, input.password)
+    token = user.get("idToken")
+    response.set_cookie(key="authToken", value=token, httponly=True)
+    return user
 
 @app.post("/signIn")
-def sign_in(input: input_models.SignUp):
-    return sign_in_with_email_and_password(input.email, input.password)
+def sign_in(input: input_models.SignUp, response: fastapi.Response):
+    user = sign_in_with_email_and_password(input.email, input.password)
+    token = user.get("idToken")
+    response.set_cookie(key="authToken", value=token, httponly=True)
+    return user
+
+@app.post("/signOut")
+def sign_out(user: Annotated[dict, Depends(get_firebase_user_from_token)], response: fastapi.Response):
+    response.set_cookie(key="authToken", value="", httponly=True, expires=0, max_age=0)
+    return user
 
 @app.post("/account/updateOutputResumeName")
 def output_resume_name_update(user: Annotated[dict, Depends(get_firebase_user_from_token)], resume_name: input_models.UpdateResumeName):
@@ -65,3 +81,7 @@ def tex_files_list(user: Annotated[dict, Depends(get_firebase_user_from_token)])
 @app.get("/account")
 def account_info(user: Annotated[dict, Depends(get_firebase_user_from_token)]):
     return get_user_data(user)
+
+@app.get("/account/outputResumeLink")
+def output_resume_link(user: Annotated[dict, Depends(get_firebase_user_from_token)]):
+    return get_output_resume_link(user)

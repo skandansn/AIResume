@@ -25,6 +25,12 @@ def get_output_resume_name(user):
 def get_resume_content(user):
     return firebase_get_resume_content(user.get("user_id"))
 
+def get_output_resume_link(user):
+    output_resume_name = get_output_resume_name(user)
+    if output_resume_name == "" or output_resume_name is None:
+        raise HTTPException(status_code=400, detail="Output resume name not set. Please set") 
+    return firebase_download_file_url(user.get("user_id") + "/" + get_output_resume_name(user)+".pdf")
+
 def get_tex_files(user):
     return firebase_get_tex_files(user.get("user_id"))
 

@@ -4,5 +4,6 @@ __pycache__/
 .venv
 app/inputFiles/*
 app/outputFiles/*
+app.log
 #do not ignore files
 !app/inputFiles/ai_prompt.py

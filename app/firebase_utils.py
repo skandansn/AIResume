@@ -1,6 +1,9 @@
 import firebase
 import config.app_configs as settings
 from google.cloud.firestore import ArrayUnion
+from requests.exceptions import HTTPError
+from fastapi import HTTPException
+from middleware.logging_middleware import logger
 
 config = {
     "apiKey": settings.settings.firebase_api_key,
@@ -17,15 +20,25 @@ config = {
 
 firebase_app = firebase.Firebase(config)
 
+def call_firebase_function_and_handle_result(firebase_function, *args):
+    try:
+        result = firebase_function(*args)
+        return result
+    except HTTPError as e:
+        logger.error(e)
+        raise HTTPException(status_code=400, detail="Invalid input. Please try again.")
+    except Exception as e:
+        logger.error(e)
+        return HTTPException(status_code=500, detail="Something terrible happened. Please try again later.")
 
 # AUTHENTICATION
 auth = firebase_app.auth()
 
 def firebase_sign_up_with_email_and_password(email, password):
-    return auth.create_user_with_email_and_password(email, password)
+    return call_firebase_function_and_handle_result(auth.create_user_with_email_and_password, email, password)
 
 def firebase_sign_in_with_email_and_password(email, password):
-    return auth.sign_in_with_email_and_password(email, password)
+    return call_firebase_function_and_handle_result(auth.sign_in_with_email_and_password, email, password)
 
 def firebase_verify_token(token):
     return auth.verify_id_token(token)
