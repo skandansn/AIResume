@@ -25,5 +25,10 @@ def get_output_resume_name(user):
 def get_resume_content(user):
     return firebase_get_resume_content(user.get("user_id"))
 
+def get_tex_files(user):
+    return firebase_get_tex_files(user.get("user_id"))
+
 def update_input_tex(user, input_tex):
-    return firebase_upload_file(input_tex["content"], user.get("user_id") + "/" + input_tex["filename"])
+    url = firebase_upload_file(input_tex["content"], user.get("user_id") + "/" + input_tex["filename"])
+    firebase_add_resume_tex_file_to_existing_tex_files(user.get("user_id"), input_tex["filename"])
+    return url

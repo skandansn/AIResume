@@ -1,5 +1,6 @@
 import firebase
 import config.app_configs as settings
+from google.cloud.firestore import ArrayUnion
 
 config = {
     "apiKey": settings.settings.firebase_api_key,
@@ -53,6 +54,12 @@ def firebase_update_resume_content(user_id, resume_content):
 
 def firebase_get_resume_content(user_id):
     return fsdb.collection("users").document(user_id).get().get("resume_content")
+
+def firebase_add_resume_tex_file_to_existing_tex_files(user_id, tex_file_name):
+    return fsdb.collection("users").document(user_id).update({"tex_files": ArrayUnion([tex_file_name])})
+
+def firebase_get_tex_files(user_id):
+    return fsdb.collection("users").document(user_id).get().get("tex_files")
 
 def firebase_create_user_in_firestore(user_id, email):
     return fsdb.collection("users").document(user_id).set({

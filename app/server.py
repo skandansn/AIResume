@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import Depends, UploadFile, File
 import pydanticModels.input_models as input_models
 from ai import generate_keywords_matched_resume
-from account import sign_up_with_email_and_password, sign_in_with_email_and_password, update_output_resume_name, update_resume_content, get_user_data, update_input_tex
+from account import sign_up_with_email_and_password, sign_in_with_email_and_password, update_output_resume_name, update_resume_content, get_user_data, update_input_tex, get_tex_files
 from fastapi.middleware.cors import CORSMiddleware
 from middleware.authentication_middleware import get_firebase_user_from_token
 
@@ -25,7 +25,7 @@ app.add_middleware(
 
 @app.get("/")
 def read_root():
-    return {"Automated Resume Parser is running!"}
+    return {"AIResume is running!"}
 
 @app.post("/keywordsInjections/jobDescription")
 def job_description_injections(user: Annotated[dict, Depends(get_firebase_user_from_token)], input: input_models.JobDescription):
@@ -57,6 +57,10 @@ async def input_tex_update(user: Annotated[dict, Depends(get_firebase_user_from_
     file["filename"] = input_tex.filename
     file["content"] = await input_tex.read()
     return update_input_tex(user, file)
+
+@app.get("/account/listTexFiles")
+def tex_files_list(user: Annotated[dict, Depends(get_firebase_user_from_token)]):
+    return get_tex_files(user)
 
 @app.get("/account")
 def account_info(user: Annotated[dict, Depends(get_firebase_user_from_token)]):
