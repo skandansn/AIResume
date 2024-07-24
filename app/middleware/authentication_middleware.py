@@ -32,7 +32,8 @@ def get_firebase_user_from_token(request: fastapi.Request, token_header: Annotat
         return user
     # lots of possible exceptions, see firebase_admin.auth,
     # but most of the time it is a credentials issue
-    except Exception:
+    except Exception as e:
+        print(e)
         # we also set the header
         # see https://fastapi.tiangolo.com/tutorial/security/simple-oauth2/
         raise HTTPException(
