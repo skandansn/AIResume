@@ -5,6 +5,6 @@ app/outputFiles/
 app/config/*secret*
 __pycache__/
 .venv
-
+app.log*
 #do not ignore files
 !app/inputFiles/resume_tex_templates/sample_resume.tex
