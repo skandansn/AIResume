@@ -24,6 +24,7 @@ def get_firebase_user_from_token(request: fastapi.Request, token_header: Annotat
             token = token_header.credentials
         else:
             token = request.cookies.get("authToken")
+        print(token)
         if not token:
             # raise and catch to return 401, only needed because fastapi returns 403
             # by default instead of 401 so we set auto_error to False
