@@ -13,7 +13,8 @@ from middleware.exception_handling_middleware import ExceptionHandlingMiddleware
 app = fastapi.FastAPI()
 
 origins = [
-    "http://localhost:3000"
+    "http://localhost:3000",
+    "https://airesume-frontend.onrender.com"
 ]
 
 app.add_middleware(
