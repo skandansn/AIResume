@@ -15,7 +15,7 @@ app = fastapi.FastAPI()
 origins = [
     "http://localhost:3000",
     "https://airesume-frontend.onrender.com",
-    "*"
+    "*.onrender.com/",
 ]
 
 app.add_middleware(
