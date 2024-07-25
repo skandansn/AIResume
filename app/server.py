@@ -14,8 +14,7 @@ app = fastapi.FastAPI()
 
 origins = [
     "http://localhost:3000",
-    "https://airesume-frontend.onrender.com",
-    "*"
+    "https://airesume-frontend.onrender.com"
 ]
 
 app.add_middleware(
@@ -53,7 +52,7 @@ def sign_up(input: input_models.SignUp, response: fastapi.Response):
 def sign_in(input: input_models.SignUp, response: fastapi.Response):
     user = sign_in_with_email_and_password(input.email, input.password)
     token = user.get("idToken")
-    response.set_cookie(key="authToken", value=token, httponly=True, samesite="None", secure=True, domain=".onrender.com")
+    response.set_cookie(key="authToken", value=token, httponly=True, samesite="None", secure=True)
     return user
 
 @app.post("/signOut")
