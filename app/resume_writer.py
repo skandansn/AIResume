@@ -8,14 +8,12 @@ def update_resume_for_job_description(content, resume_name):
     skills = get_named_section_from_ai_response(content, "SkillsSectionStart", "SkillsSectionEnd")
     experience = get_named_section_from_ai_response(content, "ExperienceSectionStart", "ExperienceSectionEnd")
     projects = get_named_section_from_ai_response(content, "ProjectsSectionStart", "ProjectsSectionEnd")
+    
+    other_items = []
+    split_section_into_section_items(other_items, experience)
+    split_section_into_section_items(other_items, projects)
 
-    sde = get_named_section_from_ai_response(experience, "sde:", "sdei:")
-    sdei = get_named_section_from_ai_response(experience, "sdei:", "ExperienceSectionEnd")
-
-    projects1 = get_named_section_from_ai_response(projects, "projects1:", "projects2:")
-    projects2 = get_named_section_from_ai_response(projects, "projects2:", "ProjectsSectionEnd")
-
-    sections = [skills, sde, sdei, projects1, projects2]
+    sections = [skills, other_items]
 
     write_to_tex_file_from_job_description(sections, resume_name)
     return True
@@ -38,6 +36,23 @@ def get_named_section_from_ai_response(content, start, end):
         named_section.append(content.pop(0))
     
     return named_section
+
+def split_section_into_section_items(items_array, section):
+    remove_heading_now = True
+    sub_section = []
+    for i in section:
+        if not(i == "" or i == " " or i == "\n"):
+            if remove_heading_now == True:
+                remove_heading_now = False
+                continue
+            sub_section.append(i)
+        else:
+            if len(sub_section) > 0:
+                items_array.append(sub_section)
+            sub_section = []
+            remove_heading_now = True
+    if len(sub_section) > 0:
+        items_array.append(sub_section)    
 
 def append_new_items_to_section_parent(section, new_items):
     for new_item in new_items:
@@ -66,9 +81,11 @@ def write_to_tex_file_from_job_description(sections, resume_name):
         item_tag = TexSoup(f'\\textbf{{{skill_name}:}} {skill_values} \\\\')
         soup.document.insert(skills_section_position-20, item_tag)
         skills_section_position += 1
+
+    other_section_items = sections[1]
     
     for label in all_labels[1:]:
-        append_new_items_to_section_parent(label, sections[all_labels.index(label)])
+        append_new_items_to_section_parent(label, other_section_items[all_labels.index(label)-1])
    
     updated_content = str(soup)
     updated_content_lines = updated_content.split("\n")
