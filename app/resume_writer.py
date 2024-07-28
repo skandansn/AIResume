@@ -66,9 +66,10 @@ def append_new_items_to_section_parent(section, new_items):
 def write_to_tex_file_from_job_description(sections, resume_names):
     tex_file_name = resume_names["tex_file_name"]
 
-    resume_tex_url = firebase_download_file_url(f'{resume_names["user_id"]}/{tex_file_name}.tex')
+    resume_tex = download_resume_tex_file_from_firebase(resume_names["user_id"], tex_file_name)
 
-    resume_tex = httpx.get(resume_tex_url)
+    if resume_tex.status_code != 200:
+        raise Exception("Error downloading tex file") #doesnt work as expected
     
     soup = TexSoup(resume_tex.text)
     
@@ -113,5 +114,15 @@ def write_to_pdf(content, resume_names):
     
     return firebase_upload_file(pdf, f'{resume_names["user_id"]}/{output_name}.pdf')
     
+def download_resume_tex_file_from_firebase(user_id, tex_file_name):
+    resume_tex_url = firebase_download_file_url(f'{user_id}/{tex_file_name}')
+    return httpx.get(resume_tex_url)
+
+def calculate_input_tex_label_count(input_tex_content):
+    string_content = input_tex_content.decode("utf-8")
+    soup = TexSoup(string_content)
+    labels = soup.find_all('label')
+    return len(labels)
+
 
 

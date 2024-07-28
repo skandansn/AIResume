@@ -62,14 +62,22 @@ def firebase_update_output_resume_name(user_id, resume_name):
 def firebase_get_output_resume_name(user_id):
     return fsdb.collection("users").document(user_id).get().get("output_resume_name")
 
-def firebase_update_resume_content(user_id, resume_content):
-    return fsdb.collection("users").document(user_id).update({"resume_content": resume_content})
+def firebase_update_resume_content(user_id, resume_content, section_items_count):    
+    return fsdb.collection("users").document(user_id).update({
+        "resume" : {
+            "content": resume_content,
+            "label_count": section_items_count
+        }
+    })
+
 
 def firebase_get_resume_content(user_id):
     return fsdb.collection("users").document(user_id).get().get("resume_content")
 
-def firebase_add_resume_tex_file_to_existing_tex_files(user_id, tex_file_name):
-    return fsdb.collection("users").document(user_id).update({"tex_files": ArrayUnion([tex_file_name])})
+def firebase_add_resume_tex_file_to_existing_tex_files(user_id, tex_file_name, label_count):
+    return fsdb.collection("users").document(user_id).update({
+        "tex_files": ArrayUnion([{"file_name": tex_file_name, "label_count": label_count}])
+    })
 
 def firebase_get_tex_files(user_id):
     return fsdb.collection("users").document(user_id).get().get("tex_files")

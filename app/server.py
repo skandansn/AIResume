@@ -69,6 +69,8 @@ def resume_content_update(user: Annotated[dict, Depends(get_firebase_user_from_t
 
 @app.post("/account/updateInputTex")
 async def input_tex_update(user: Annotated[dict, Depends(get_firebase_user_from_token)], input_tex: UploadFile = File(...)):
+    if not input_tex.filename.endswith(".tex"):
+        return JSONResponse(status_code=400, content={"message": "Please upload a .tex file"})
     file = {}
     file["filename"] = input_tex.filename
     file["content"] = await input_tex.read()
