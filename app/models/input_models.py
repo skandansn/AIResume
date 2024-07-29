@@ -11,3 +11,13 @@ class JobDescription(BaseModel):
     keywords : Keywords
     resume_name : Optional[str] = "whole_resume"
 
+class SignUp(BaseModel):
+    email : str
+    password : str
+
+class UpdateResumeName(BaseModel):
+    resume_name : str
+
+class ResumeContent(BaseModel):
+    resume_content : str
+
