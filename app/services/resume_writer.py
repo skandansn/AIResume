@@ -1,7 +1,7 @@
 from TexSoup import TexSoup
 from pdflatex import PDFLaTeX
 from config.app_configs import settings
-from firebase_utils import firebase_upload_file, firebase_download_file_url
+from .firebase_utils import firebase_upload_file, firebase_download_file_url
 import httpx 
 
 def update_resume_for_job_description(content, resume_names):
@@ -10,14 +10,12 @@ def update_resume_for_job_description(content, resume_names):
     skills = get_named_section_from_ai_response(content, "SkillsSectionStart", "SkillsSectionEnd")
     experience = get_named_section_from_ai_response(content, "ExperienceSectionStart", "ExperienceSectionEnd")
     projects = get_named_section_from_ai_response(content, "ProjectsSectionStart", "ProjectsSectionEnd")
+    
+    other_items = []
+    split_section_into_section_items(other_items, experience)
+    split_section_into_section_items(other_items, projects)
 
-    sde = get_named_section_from_ai_response(experience, "sde:", "sdei:")
-    sdei = get_named_section_from_ai_response(experience, "sdei:", "ExperienceSectionEnd")
-
-    projects1 = get_named_section_from_ai_response(projects, "projects1:", "projects2:")
-    projects2 = get_named_section_from_ai_response(projects, "projects2:", "ProjectsSectionEnd")
-
-    sections = [skills, sde, sdei, projects1, projects2]
+    sections = [skills, other_items]
 
     return write_to_tex_file_from_job_description(sections, resume_names)
 
@@ -40,6 +38,23 @@ def get_named_section_from_ai_response(content, start, end):
     
     return named_section
 
+def split_section_into_section_items(items_array, section):
+    remove_heading_now = True
+    sub_section = []
+    for i in section:
+        if not(i == "" or i == " " or i == "\n"):
+            if remove_heading_now == True:
+                remove_heading_now = False
+                continue
+            sub_section.append(i)
+        else:
+            if len(sub_section) > 0:
+                items_array.append(sub_section)
+            sub_section = []
+            remove_heading_now = True
+    if len(sub_section) > 0:
+        items_array.append(sub_section)    
+
 def append_new_items_to_section_parent(section, new_items):
     for new_item in new_items:
         if new_item == "" or new_item == " " or new_item == "\n":
@@ -51,9 +66,10 @@ def append_new_items_to_section_parent(section, new_items):
 def write_to_tex_file_from_job_description(sections, resume_names):
     tex_file_name = resume_names["tex_file_name"]
 
-    resume_tex_url = firebase_download_file_url(f'{resume_names["user_id"]}/{tex_file_name}.tex')
+    resume_tex = download_resume_tex_file_from_firebase(resume_names["user_id"], tex_file_name)
 
-    resume_tex = httpx.get(resume_tex_url)
+    if resume_tex.status_code != 200:
+        raise Exception("Error downloading tex file") #doesnt work as expected
     
     soup = TexSoup(resume_tex.text)
     
@@ -70,9 +86,11 @@ def write_to_tex_file_from_job_description(sections, resume_names):
         item_tag = TexSoup(f'\\textbf{{{skill_name}:}} {skill_values} \\\\')
         soup.document.insert(skills_section_position-20, item_tag)
         skills_section_position += 1
+
+    other_section_items = sections[1]
     
     for label in all_labels[1:]:
-        append_new_items_to_section_parent(label, sections[all_labels.index(label)])
+        append_new_items_to_section_parent(label, other_section_items[all_labels.index(label)-1])
    
     updated_content = str(soup)
     updated_content_lines = updated_content.split("\n")
@@ -96,5 +114,15 @@ def write_to_pdf(content, resume_names):
     
     return firebase_upload_file(pdf, f'{resume_names["user_id"]}/{output_name}.pdf')
     
+def download_resume_tex_file_from_firebase(user_id, tex_file_name):
+    resume_tex_url = firebase_download_file_url(f'{user_id}/{tex_file_name}')
+    return httpx.get(resume_tex_url)
+
+def calculate_input_tex_label_count(input_tex_content):
+    string_content = input_tex_content.decode("utf-8")
+    soup = TexSoup(string_content)
+    labels = soup.find_all('label')
+    return len(labels)
+
 
 
