@@ -1,5 +1,6 @@
 import fastapi
 from routers import auth, profile, ai
+from config.app_configs import settings
 from fastapi.middleware.cors import CORSMiddleware
 from middleware.logging_middleware import LoggingMiddleware
 from middleware.exception_handling_middleware import ExceptionHandlingMiddleware
@@ -7,7 +8,7 @@ from middleware.exception_handling_middleware import ExceptionHandlingMiddleware
 app = fastapi.FastAPI()
 
 origins = [
-    "http://localhost:3000"
+    settings.frontend_url
 ]
 
 app.add_middleware(CORSMiddleware,allow_origins=origins,allow_credentials=True,allow_methods=["*"],allow_headers=["*"])

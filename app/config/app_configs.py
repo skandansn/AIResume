@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     firebase_measurement_id: str = "firebase_measurement_id"
     firebase_database_url: str = "firebase_database_url"
     local_saving: bool = False
+    frontend_url: str = "http://localhost:3000"
 
     model_config = SettingsConfigDict(env_file=".env")
 
