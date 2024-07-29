@@ -38,6 +38,8 @@ def job_description_injections(user: Annotated[dict, Depends(get_firebase_user_f
         return "Please provide at least keywords.mandatory_keywords or set keywords.optional_keywords to true"
     if input.resume_name == "":
         return "Please provide a resume name"
+    if input.description == "" and input.keywords.optional_keywords == True:
+        return "Please provide a job description if you want to use optional AI keywords"
     return generate_keywords_matched_resume(user.get("user_id"), input.description, input.keywords, input.resume_name)
 
 @app.post("/signUp")
