@@ -1,7 +1,7 @@
 from TexSoup import TexSoup
 from pdflatex import PDFLaTeX
 from config.app_configs import settings
-from firebase_utils import firebase_upload_file, firebase_download_file_url
+from .firebase_utils import firebase_upload_file, firebase_download_file_url
 import httpx 
 
 def update_resume_for_job_description(content, resume_names):

@@ -1,8 +1,8 @@
 import google.generativeai as genai
 from inputFiles import ai_prompt as ai_prompts
-from resume_writer import update_resume_for_job_description
+from .resume_writer import update_resume_for_job_description
 from config.app_configs import settings
-from firebase_utils import firebase_get_user_from_firestore
+from .firebase_utils import firebase_get_user_from_firestore
 
 def call_ai_and_get_response_text(prompt):
     genai.configure(api_key=settings.gemini_api_key)

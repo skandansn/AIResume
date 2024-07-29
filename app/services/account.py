@@ -1,5 +1,5 @@
-from firebase_utils import *
-from resume_writer import calculate_input_tex_label_count, get_named_section_from_ai_response, split_section_into_section_items
+from .firebase_utils import *
+from .resume_writer import calculate_input_tex_label_count, get_named_section_from_ai_response, split_section_into_section_items
 
 def sign_up_with_email_and_password(email, password):
     user = firebase_sign_up_with_email_and_password(email, password)

@@ -1,7 +1,7 @@
 from typing import Annotated
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from firebase_utils import firebase_verify_token
+from services.firebase_utils import firebase_verify_token
 import fastapi
 
 # use of a simple bearer scheme as auth is handled by firebase and not fastapi
@@ -29,6 +29,7 @@ def get_firebase_user_from_token(request: fastapi.Request, token_header: Annotat
             # by default instead of 401 so we set auto_error to False
             raise ValueError("No token")
         user = firebase_verify_token(token)
+        request.state.logged_in_user = user
         return user
     # lots of possible exceptions, see firebase_admin.auth,
     # but most of the time it is a credentials issue
