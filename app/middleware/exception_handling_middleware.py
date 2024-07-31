@@ -9,6 +9,7 @@ class ExceptionHandlingMiddleware(BaseHTTPMiddleware):
             response = await call_next(request)
             return response
         except Exception as e:
+            print(e)
             logger.error(f"Unhandled exception: {e}", exc_info=True)
             response = JSONResponse(
                 status_code=500,
