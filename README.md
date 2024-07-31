@@ -17,3 +17,5 @@ Flow:
 4) AIResume finds the most important keywords for this job description and finds a way to add them to your resume.
 
 5) Generate the final updated PDF version of your new resume.
+
+Can be used as an REST API: https://airesume-backend.onrender.com
