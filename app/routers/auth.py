@@ -15,13 +15,15 @@ router = APIRouter(
 def sign_up(input: input_models.SignUp, response: Response):
     user = sign_up_with_email_and_password(input.email, input.password)
     token = user.get("idToken")
-    response.set_cookie(key="authToken", value=token, httponly=True)
+    response.delete_cookie("authToken")
+    response.set_cookie(key="authToken", value=token, httponly=True, samesite="none", secure=True)
     return user
 
 @router.post("/signIn")
 def sign_in(input: input_models.SignUp, response: Response):
     user = sign_in_with_email_and_password(input.email, input.password)
     token = user.get("idToken")
+    response.delete_cookie("authToken")
     response.set_cookie(key="authToken", value=token, httponly=True, samesite="none", secure=True)
     return user
 
