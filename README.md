@@ -1,19 +1,27 @@
-AIResume has the power to pass ATS checks!
+AIResume has the power to pass ATS checks! 
+
+Check out the front end app: https://airesume-frontend.onrender.com
 
 It can alter your resume to match with keywords that are expected for a specific job application.
 
-Technologies used:
-FastAPI (Python) based back-end system.
+Technologies used: NextJS for the front-end. FastAPI (Python) based back-end system.
 
 Gemini AI for generative AI (generating updated resume)
 
+Firebase and Firestore for data and file storage.
+
 Flow:
-1) Provide the job description to the API.
 
-2) Optionally provide some manadatory keywords that has to be in the new updated resume.
+Provide the job description to the API.
 
-3) Optionally specify which of your resumes to update (can store and use multiple different resume at a time)
+Optionally provide some manadatory keywords that has to be in the new updated resume.
 
-4) AIResume finds the most important keywords for this job description and finds a way to add them to your resume.
+Optinally provide some keywords that have to be ignored in the final resume.
 
-5) Generate the final updated PDF version of your new resume.
+Optionally specify which of your resumes to update (can store and use multiple different resume at a time)
+
+AIResume finds the most important keywords for this job description and finds a way to add them to your resume.
+
+Generate the final updated PDF version of your new resume.
+
+Can also be used as an REST API: https://airesume-backend.onrender.com
