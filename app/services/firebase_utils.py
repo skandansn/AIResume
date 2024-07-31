@@ -75,9 +75,19 @@ def firebase_get_resume_content(user_id):
     return fsdb.collection("users").document(user_id).get().get("resume_content")
 
 def firebase_add_resume_tex_file_to_existing_tex_files(user_id, tex_file_name, label_count):
-    return fsdb.collection("users").document(user_id).update({
-        "tex_files": ArrayUnion([{"file_name": tex_file_name, "label_count": label_count}])
-    })
+    # should add the tex file to the existing tex files array if it doesn't already exist. if it does, update the label count alone 
+    tex_files = fsdb.collection("users").document(user_id).get().get("tex_files")
+    if tex_files is None:
+        tex_files = []
+    tex_file = next((item for item in tex_files if item["file_name"] == tex_file_name), None)
+    if tex_file is None:
+        tex_files.append({
+            "file_name": tex_file_name,
+            "label_count": label_count
+        })
+    else:
+        tex_file["label_count"] = label_count
+    return fsdb.collection("users").document(user_id).update({"tex_files": tex_files})
 
 def firebase_get_tex_files(user_id):
     return fsdb.collection("users").document(user_id).get().get("tex_files")
