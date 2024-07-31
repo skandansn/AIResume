@@ -22,7 +22,7 @@ def sign_up(input: input_models.SignUp, response: Response):
 def sign_in(input: input_models.SignUp, response: Response):
     user = sign_in_with_email_and_password(input.email, input.password)
     token = user.get("idToken")
-    response.set_cookie(key="authToken", value=token, httponly=True, samesite="none", secure=True)
+    response.set_cookie(key="authToken", value=token, httponly=True, samesite="none", secure=True, domain=".airesume.onrender.com")
     return user
 
 @router.post("/signOut")
