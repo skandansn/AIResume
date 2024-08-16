@@ -30,6 +30,7 @@ def get_firebase_user_from_token(request: fastapi.Request, token_header: Annotat
             raise ValueError("No token")
         user = firebase_verify_token(token)
         request.state.logged_in_user = user
+        request.state.logged_in_user["logged_in_token"] = token
         return user
     # lots of possible exceptions, see firebase_admin.auth,
     # but most of the time it is a credentials issue

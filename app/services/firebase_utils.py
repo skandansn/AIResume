@@ -46,37 +46,37 @@ def firebase_verify_token(token):
 # STORAGE
 storage = firebase_app.storage()
 
-def firebase_download_file_url(file_name):
-    return storage.child(file_name).get_url()
+def firebase_download_file_url(file_name, user):
+    return storage.child(file_name).get_url(user.get("logged_in_token"))
 
-def firebase_upload_file(file, file_name):
-    storage.child(file_name).put(file)
-    return firebase_download_file_url(file_name)
+def firebase_upload_file(file, file_name, user):
+    storage.child(file_name).put(file, token=user.get("logged_in_token"))
+    return firebase_download_file_url(file_name, user)
 
 # FIRESTORE
 fsdb = firebase_app.firestore()
 
-def firebase_update_output_resume_name(user_id, resume_name):
-    return fsdb.collection("users").document(user_id).update({"output_resume_name": resume_name})
+def firebase_update_output_resume_name(user, resume_name):
+    return fsdb.collection("users").document(user.get("user_id")).update({"output_resume_name": resume_name}, token = user.get("logged_in_token"))
 
-def firebase_get_output_resume_name(user_id):
-    return fsdb.collection("users").document(user_id).get().get("output_resume_name")
+def firebase_get_output_resume_name(user):
+    return fsdb.collection("users").document(user.get("user_id")).get(token=user.get("logged_in_token")).get("output_resume_name")
 
-def firebase_update_resume_content(user_id, resume_content, section_items_count):    
-    return fsdb.collection("users").document(user_id).update({
+def firebase_update_resume_content(user, resume_content, section_items_count):    
+    return fsdb.collection("users").document(user.get("user_id")).update({
         "resume" : {
             "content": resume_content,
             "label_count": section_items_count
         }
-    })
+    }, token = user.get("logged_in_token"))
 
 
-def firebase_get_resume_content(user_id):
-    return fsdb.collection("users").document(user_id).get().get("resume_content")
+def firebase_get_resume_content(user):
+    return fsdb.collection("users").document(user.get("user_id")).get(token=user.get("logged_in_token")).get("resume_content")
 
-def firebase_add_resume_tex_file_to_existing_tex_files(user_id, tex_file_name, label_count):
+def firebase_add_resume_tex_file_to_existing_tex_files(user, tex_file_name, label_count):
     # should add the tex file to the existing tex files array if it doesn't already exist. if it does, update the label count alone 
-    tex_files = fsdb.collection("users").document(user_id).get().get("tex_files")
+    tex_files = fsdb.collection("users").document(user.get("user_id")).get(token=user.get("logged_in_token")).get("tex_files")
     if tex_files is None:
         tex_files = []
     tex_file = next((item for item in tex_files if item["file_name"] == tex_file_name), None)
@@ -87,15 +87,15 @@ def firebase_add_resume_tex_file_to_existing_tex_files(user_id, tex_file_name, l
         })
     else:
         tex_file["label_count"] = label_count
-    return fsdb.collection("users").document(user_id).update({"tex_files": tex_files})
+    return fsdb.collection("users").document(user.get("user_id")).update({"tex_files": tex_files}, token = user.get("logged_in_token"))
 
-def firebase_get_tex_files(user_id):
-    return fsdb.collection("users").document(user_id).get().get("tex_files")
+def firebase_get_tex_files(user):
+    return fsdb.collection("users").document(user.get("user_id")).get(token=user.get("logged_in_token")).get("tex_files")
 
-def firebase_create_user_in_firestore(user_id, email):
-    return fsdb.collection("users").document(user_id).set({
+def firebase_create_user_in_firestore(user, email):
+    return fsdb.collection("users").document(user.get("localId")).set({
         "email": email
-    })
+    }, token = user.get("idToken"))
 
-def firebase_get_user_from_firestore(user_id):
-    return fsdb.collection("users").document(user_id).get()
+def firebase_get_user_from_firestore(user):
+    return fsdb.collection("users").document(user.get("user_id")).get(token=user.get("logged_in_token"))

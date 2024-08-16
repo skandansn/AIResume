@@ -18,4 +18,4 @@ def job_description_injections(request:Request, input: input_models.JobDescripti
         return "Please provide a resume name"
     if input.description == "" and input.keywords.optional_keywords == True:
         return "Please provide a job description if you want to use optional AI keywords"
-    return generate_keywords_matched_resume(request.state.logged_in_user.get("user_id"), input.description, input.keywords, input.resume_name)
+    return generate_keywords_matched_resume(request.state.logged_in_user, input.description, input.keywords, input.resume_name)

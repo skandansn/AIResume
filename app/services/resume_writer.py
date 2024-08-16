@@ -4,7 +4,7 @@ from config.app_configs import settings
 from .firebase_utils import firebase_upload_file, firebase_download_file_url
 import httpx 
 
-def update_resume_for_job_description(content, resume_names):
+def update_resume_for_job_description(content, resume_names, user):
     content = post_process_ai_response(content)
 
     skills = get_named_section_from_ai_response(content, "SkillsSectionStart", "SkillsSectionEnd")
@@ -17,7 +17,7 @@ def update_resume_for_job_description(content, resume_names):
 
     sections = [skills, other_items]
 
-    return write_to_tex_file_from_job_description(sections, resume_names)
+    return write_to_tex_file_from_job_description(sections, resume_names, user)
 
 def post_process_ai_response(content):
     #remove any occurrences of * or **
@@ -63,10 +63,10 @@ def append_new_items_to_section_parent(section, new_items):
         section.parent.append(item_tag)
     
 
-def write_to_tex_file_from_job_description(sections, resume_names):
+def write_to_tex_file_from_job_description(sections, resume_names, user):
     tex_file_name = resume_names["tex_file_name"]
 
-    resume_tex = download_resume_tex_file_from_firebase(resume_names["user_id"], tex_file_name)
+    resume_tex = download_resume_tex_file_from_firebase(user, tex_file_name)
 
     if resume_tex.status_code != 200:
         raise Exception("Error downloading tex file") #doesnt work as expected
@@ -102,20 +102,20 @@ def write_to_tex_file_from_job_description(sections, resume_names):
 
     updated_content = updated_content.encode('utf-8')
     
-    return write_to_pdf(updated_content, resume_names)
+    return write_to_pdf(updated_content, resume_names, user)
     
 
-def write_to_pdf(content, resume_names):
+def write_to_pdf(content, resume_names, user):
     pdfl = PDFLaTeX.from_binarystring(content, resume_names["output_resume_name"])
     pdfl.set_interaction_mode()
     pdf, log, completed_process = pdfl.create_pdf(keep_pdf_file=False, keep_log_file=False)
     
     output_name = resume_names["output_resume_name"]
     
-    return firebase_upload_file(pdf, f'{resume_names["user_id"]}/{output_name}.pdf')
+    return firebase_upload_file(pdf, f'{user.get("user_id")}/{output_name}.pdf', user)
     
-def download_resume_tex_file_from_firebase(user_id, tex_file_name):
-    resume_tex_url = firebase_download_file_url(f'{user_id}/{tex_file_name}')
+def download_resume_tex_file_from_firebase(user, tex_file_name):
+    resume_tex_url = firebase_download_file_url(f'{user.get("user_id")}/{tex_file_name}', user)
     return httpx.get(resume_tex_url)
 
 def calculate_input_tex_label_count(input_tex_content):

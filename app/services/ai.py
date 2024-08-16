@@ -10,8 +10,8 @@ def call_ai_and_get_response_text(prompt):
     response = model.generate_content(prompt)
     return response.text
 
-def generate_keywords_matched_resume(user_id, description, input_keywords, tex_file_name):
-    user_data = firebase_get_user_from_firestore(user_id)
+def generate_keywords_matched_resume(user, description, input_keywords, tex_file_name):
+    user_data = firebase_get_user_from_firestore(user)
 
     resume_label_count = user_data.get("resume").get("label_count")
     found_tex_file = False
@@ -44,9 +44,9 @@ def generate_keywords_matched_resume(user_id, description, input_keywords, tex_f
 
     prompt = ai_prompts.inject_keywords_into_resume_prompt + keywords + " \n This is my resume sections. \n" + user_data.get("resume").get("content")
     response = call_ai_and_get_response_text(prompt)
-    resume_names = {"tex_file_name": tex_file_name, "output_resume_name": user_data.get("output_resume_name"), "user_id": user_id}
+    resume_names = {"tex_file_name": tex_file_name, "output_resume_name": user_data.get("output_resume_name")}
         
-    return update_resume_for_job_description(response, resume_names)
+    return update_resume_for_job_description(response, resume_names, user)
 
 def generate_keywords_from_job_description(description):
     prompt = ai_prompts.extract_keywords_from_job_description_prompt + description
