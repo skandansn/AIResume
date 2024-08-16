@@ -15,4 +15,6 @@ COPY ./app ./app
 
 CMD ["fastapi", "run", "app/server.py", "--port", "80"]
 
-
+# docker build -t appname .
+# docker tag appname:latest registry.gitlab.com/username/appname:latest
+# docker push registry.gitlab.com/username/appname:latest
