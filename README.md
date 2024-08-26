@@ -2,6 +2,8 @@ AIResume has the power to pass ATS checks!
 
 Check out the front end app: https://airesume-frontend.onrender.com (might take some time to launch the servers after an idle time)
 
+Demo creds: email:godskandan@gmail.com password:skandan
+
 It can alter your resume to match with keywords that are expected for a specific job application.
 
 Technologies used: NextJS for the front-end. FastAPI (Python) based back-end system.
