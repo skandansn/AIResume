@@ -6,7 +6,7 @@ from .firebase_utils import firebase_get_user_from_firestore
 
 def call_ai_and_get_response_text(prompt):
     genai.configure(api_key=settings.gemini_api_key)
-    model = genai.GenerativeModel('gemini-1.5-flash')
+    model = genai.GenerativeModel('gemini-1.5-pro')
     response = model.generate_content(prompt)
     return response.text
 
