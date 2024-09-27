@@ -16,6 +16,13 @@ inject_keywords_into_resume_prompt = """
     ii) Among the key words given, find the important key words that are missing in my resume.
     iii) Add those key words in the resume in such a way that my resume has all those important missing key words explictly mentioned, spread out throughout SkillsSection, ExperienceSection and ProjectsSection.
     iv) Try to add the keywords as part of an existing sentence or bullet point in the resume. If you cannot find a suitable place to add the keyword, add a new bullet point with the keyword.
+
+    All points must be in the below format:
+    XYZ: Accomplished X as measured by Y by doing Z
+    Examples:
+    Drove the test-driven development of end-to-end features and REST APIs across PHP, Go, Python, and Java microservices to enhance card and UPI recurring payment methods, impacting over 100,000 users.
+    Amplified unit test and integration test coverage of the Razorpay Subscriptions product by 15% through the creation of automated PHPUnit and JUnit tests, enhancing product stability and reducing bug occurrences.    
+
     Make sure to add each keyword only once.
     Give me the final updated resume which has the key words added in the same format as the input.
 
