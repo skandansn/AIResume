@@ -1,13 +1,15 @@
-import google.generativeai as genai
+from google import genai
 from inputFiles import ai_prompt as ai_prompts
 from .resume_writer import update_resume_for_job_description
 from config.app_configs import settings
 from .firebase_utils import firebase_get_user_from_firestore
 
 def call_ai_and_get_response_text(prompt):
-    genai.configure(api_key=settings.gemini_api_key)
-    model = genai.GenerativeModel('gemini-1.5-pro')
-    response = model.generate_content(prompt)
+    client = genai.Client(api_key=settings.gemini_api_key)
+    response = client.models.generate_content(
+        model='gemini-2.0-flash',
+        contents=prompt
+    )
     return response.text
 
 def generate_keywords_matched_resume(user, description, input_keywords, tex_file_name):

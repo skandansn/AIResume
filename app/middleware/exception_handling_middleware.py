@@ -14,6 +14,11 @@ class ExceptionHandlingMiddleware(BaseHTTPMiddleware):
                 status_code=500,
                 content={"detail": "An internal server error occurred."}
             )
-            response.headers["Access-Control-Allow-Origin"] = request.headers.get("Origin")
+        origin = request.headers.get("Origin")
+        if origin:
+            response.headers["Access-Control-Allow-Origin"] = origin
             response.headers["Access-Control-Allow-Credentials"] = "true"
+        else:
+            # For requests without Origin header, just allow all origins without credentials
+            response.headers["Access-Control-Allow-Origin"] = "*"
             return response
