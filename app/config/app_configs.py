@@ -3,6 +3,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     app_name: str = "AIResume"
     gemini_api_key: str = "gemini_api_key"
+    # google retires model ids, so keep this overridable from .env
+    gemini_model: str = "gemini-3.6-flash"
     firebase_api_key: str = "firebase_api_key"
     firebase_auth_domain: str = "firebase_auth_domain"
     firebase_project_id: str = "firebase_project_id"

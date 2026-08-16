@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import List, Optional
 
 class Keywords(BaseModel):
     optional_keywords : bool = True
@@ -10,6 +10,12 @@ class JobDescription(BaseModel):
     description : str
     keywords : Keywords
     resume_name : Optional[str] = "whole_resume"
+    # the skills the candidate confirmed they can claim. when present these are
+    # used as they are, instead of asking the AI to pick keywords itself.
+    approved_keywords : Optional[List[str]] = None
+
+class JobDescriptionKeywords(BaseModel):
+    description : str
 
 class SignUp(BaseModel):
     email : str
@@ -20,4 +26,3 @@ class UpdateResumeName(BaseModel):
 
 class ResumeContent(BaseModel):
     resume_content : str
-

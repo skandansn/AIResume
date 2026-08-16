@@ -1,7 +1,7 @@
-from fastapi import APIRouter, Depends, Request, Response
+from fastapi import APIRouter, Depends, Request, Response, HTTPException
 from dependencies import get_firebase_user_from_token
 from typing import Annotated
-from services.account import update_output_resume_name, update_resume_content, get_user_data, update_input_tex, get_tex_files, get_output_resume_link
+from services.account import update_output_resume_name, update_resume_content, get_user_data, update_input_tex, get_tex_files
 from fastapi import UploadFile, File
 from starlette.responses import JSONResponse
 from models import input_models
@@ -39,9 +39,10 @@ def tex_files_list(request:Request):
     return get_tex_files(request.state.logged_in_user)
 
 @router.get("/outputResumeLink")
-def output_resume_link(request:Request):
-    return get_output_resume_link(request.state.logged_in_user)
-
-
-
-
+def output_resume_link():
+    # generated resumes are no longer stored, so there is no link to hand out.
+    # POST /keywordsInjections/jobDescription returns the PDF itself instead.
+    raise HTTPException(
+        status_code=410,
+        detail="Generated resumes are returned directly by /keywordsInjections/jobDescription and are no longer stored."
+    )

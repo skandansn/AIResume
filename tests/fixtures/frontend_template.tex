@@ -1,0 +1,95 @@
+% \documentclass[11pt]{article}       % set main text size
+% \usepackage[a4paper,                % set paper size to A4. change to letterpaper for US/Canadian resumes
+% top=0.5in,                          % specify top page margin
+% bottom=0.5in,                       % specify bottom page margin
+% left=0.5in,                         % specify left page margin
+% right=0.5in]{geometry}              % specify right page margin
+                       
+% \usepackage{XCharter}               % set font
+% \usepackage[T1]{fontenc}            % output encoding
+% \usepackage[utf8]{inputenc}         % input encoding
+% \usepackage{enumitem}               % enable lists for bullet points: itemize and \item
+% \usepackage[hidelinks]{hyperref}    % format hyperlinks
+% \usepackage{titlesec}               % enable section title customization
+% \raggedright                        % disable text justification
+% \pagestyle{empty}                   % disable page numbering
+
+% % ensure PDF output will be all-Unicode and machine-readable
+% \input{glyphtounicode}
+% \pdfgentounicode=1
+
+% % format section headings: bolding, size, white space above and below
+% \titleformat{\section}{\bfseries\large}{}{0pt}{}[\vspace{1pt}\titlerule\vspace{-6.5pt}]
+
+% % format bullet points: size, white space above and below, white space between bullets
+% \renewcommand\labelitemi{$\vcenter{\hbox{\small$\bullet$}}$}
+% \setlist[itemize]{itemsep=-2pt, leftmargin=12pt}
+
+% resume starts here
+\begin{document}
+
+% name
+\centerline{\Huge Alex Morgan}
+
+\vspace{5pt}
+
+% contact information
+\centerline{\href{mailto:alex@example.com}{alex@example.com} | (555) 010-2030 | \href{https://linkedin.com/in/alexmorgan}{linkedin.com/in/alexmorgan} | \href{https://github.com/alexmorgan}{github.com/alexmorgan}}
+
+\vspace{-10pt}
+
+% skills section
+\section*{Skills}
+\label{skillsSection}
+
+
+\vspace{-6.5pt}
+
+% experience section
+\section*{Experience}
+\textbf{Senior Engineer,} Acme Corp -- Boston, MA \hfill Jun 2023 -- Present \\
+\vspace{-9pt}
+\begin{itemize}
+  \label{airesumeItem1}
+
+\end{itemize}
+
+\textbf{Engineer,} Globex -- Remote \hfill Jan 2021 -- May 2023 \\
+\vspace{-9pt}
+\begin{itemize}
+  \label{airesumeItem2}
+
+\end{itemize}
+
+\vspace{-18.5pt}
+
+% projects section
+\section*{Projects}
+\textbf{Trailmix} \hfill \href{https://github.com/alexmorgan/trailmix}{github.com/alexmorgan/trailmix} \\
+\vspace{-9pt}
+\begin{itemize}
+  \label{airesumeItem3}
+
+\end{itemize}
+
+\textbf{Note G} \\
+\vspace{-9pt}
+\begin{itemize}
+  \label{airesumeItem4}
+
+\end{itemize}
+
+\vspace{-18.5pt}
+
+% education section
+\section*{Education}
+\textbf{Northeastern University, Boston, MA} \hfill May 2023 \\
+B.S. in Computer Science \hfill GPA: 3.8/4.0 \\
+
+% awards section
+\section*{Awards and Publications}
+\begin{itemize}
+  \item Dean's List, 2021-2023
+\end{itemize}
+
+\end{document}
