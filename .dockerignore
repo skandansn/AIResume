@@ -1,0 +1,20 @@
+# The image is published to a public registry, so nothing secret or personal
+# should end up in a layer. Docker does not read .gitignore, so this repeats it.
+app/config/*secret*.json
+.env
+.env.*
+
+# generated resumes and uploaded templates belong to whoever ran the app
+app/outputFiles/
+app.log
+*.log
+
+# not needed to run the server
+.venv/
+.git/
+.gitignore
+tests/
+requirements-dev.txt
+README.md
+**/__pycache__/
+*.pyc
