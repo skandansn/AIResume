@@ -59,3 +59,50 @@ class TailoredResumeResponse(BaseModel):
     file_name: str
     pdf_base64: str
     report: CoverageReport
+
+
+# ---- reading an existing resume so the form can be filled in for the user ----
+
+
+class ParsedSkillGroup(BaseModel):
+    category: str = Field(description="The heading this group of skills sits under, for example 'Languages'.")
+    skills: str = Field(description="The skills in that group, comma separated.")
+
+
+class ParsedExperience(BaseModel):
+    role: str = Field(description="Job title, exactly as written.")
+    company: str = Field(description="Employer name, exactly as written.")
+    location: str = Field(default="", description="City and state or country, if given.")
+    start_date: str = Field(default="", description="Start date as written, for example 'Jun 2023'.")
+    end_date: str = Field(default="", description="End date as written, or 'Present'.")
+    bullets: List[str] = Field(description="One entry per bullet point, copied word for word.")
+
+
+class ParsedProject(BaseModel):
+    name: str = Field(description="Project name, exactly as written.")
+    url: str = Field(default="", description="Link to the project, if one is given.")
+    bullets: List[str] = Field(description="One entry per bullet point, copied word for word.")
+
+
+class ParsedEducation(BaseModel):
+    school: str = Field(description="Institution name.")
+    location: str = Field(default="", description="City and state or country, if given.")
+    degree: str = Field(default="", description="Degree and field, for example 'B.S. in Computer Science'.")
+    graduation: str = Field(default="", description="Graduation date as written.")
+    detail: str = Field(default="", description="Anything shown alongside, such as a GPA.")
+
+
+class ParsedResume(BaseModel):
+    """A resume read back out of a file the candidate already had."""
+
+    full_name: str = ""
+    email: str = ""
+    phone: str = ""
+    linkedin: str = ""
+    github: str = ""
+    website: str = ""
+    skills: List[ParsedSkillGroup] = []
+    experience: List[ParsedExperience] = []
+    projects: List[ParsedProject] = []
+    education: List[ParsedEducation] = []
+    extras: List[str] = Field(default=[], description="Awards, publications and anything else, one line each.")

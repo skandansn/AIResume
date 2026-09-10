@@ -4,7 +4,7 @@ from fastapi import HTTPException
 from pydantic import ValidationError
 from inputFiles import ai_prompt as ai_prompts
 from middleware.logging_middleware import logger
-from models.ai_models import ExtractedKeywords, TailoredResume
+from models.ai_models import ExtractedKeywords, ParsedResume, TailoredResume
 from config.app_configs import settings
 from .resume_writer import (
     build_coverage_report,
@@ -149,6 +149,27 @@ def generate_keywords_matched_resume(user, description, input_keywords, tex_file
     report = build_coverage_report(pdf, checked, tailored.keywords_skipped)
 
     return pdf, output_resume_name, report
+
+
+# a resume is long, and only the first pages of one are ever the resume
+MAX_RESUME_CHARACTERS = 20000
+
+def read_resume_from_text(text):
+    """Turns the text of a resume the candidate already has into form fields."""
+    if not text or not text.strip():
+        raise HTTPException(status_code=400, detail="That file had no text in it. Try another file, or type your details in.")
+
+    if len(text.strip()) < 120:
+        raise HTTPException(
+            status_code=400,
+            detail="There was hardly any text in that file. If it is a scan, the words are pictures rather than text.",
+        )
+
+    return call_ai_for_model(
+        ai_prompts.read_resume_prompt + text.strip()[:MAX_RESUME_CHARACTERS],
+        ParsedResume,
+        system_instruction=ai_prompts.read_resume_system_instruction,
+    )
 
 def generate_keywords_from_job_description(description):
     """Kept for backwards compatibility; returns a comma separated string."""

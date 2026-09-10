@@ -121,6 +121,35 @@ def build_required_instruction(mandatory_keywords):
     )
 
 
+read_resume_system_instruction = """
+You read a resume that someone already has and write down what is in it, so a
+form can be filled in on their behalf. You are transcribing, not writing.
+
+- Copy bullet points word for word. Do not reword, shorten, merge, split or
+  improve them, and do not fix their grammar. Leave out the bullet character
+  itself, and any numbering: the words only.
+- Never add anything that is not in the document. If a field is not there, leave
+  it empty. An empty field is correct; a guess is not.
+- Keep dates exactly as written, including words like Present.
+- Keep numbers and percentages as they appear.
+- Group skills the way the resume groups them. If it lists skills without
+  groups, put them all under a single group called Skills.
+- Treat anything that reads as an award, publication, certification or activity
+  as an extra, one line each, copied as written.
+- Contact details: pull out the email, phone and any personal links. Give links
+  without the scheme, for example linkedin.com/in/someone.
+- The text comes from a PDF, so the layout may be jumbled and columns may be
+  interleaved. Use your judgement about what belongs together, but never invent
+  the parts that are missing.
+"""
+
+read_resume_prompt = """
+Read the resume below and write down what it contains.
+
+The text was extracted from a file, so spacing and ordering may be untidy:
+
+"""
+
 # kept for backwards compatibility with anything importing the old names
 extract_keywords_from_job_description_prompt = extract_keywords_prompt
 inject_keywords_into_resume_prompt = tailor_resume_prompt

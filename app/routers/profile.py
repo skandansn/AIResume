@@ -1,10 +1,12 @@
 from fastapi import APIRouter, Depends, Request, Response, HTTPException
 from dependencies import get_firebase_user_from_token
 from typing import Annotated
-from services.account import update_output_resume_name, update_resume_content, get_user_data, update_input_tex, get_tex_files
+from services.account import update_output_resume_name, update_resume_content, get_user_data, update_input_tex, get_tex_files, update_profile
+from services.ai import read_resume_from_text
 from fastapi import UploadFile, File
 from starlette.responses import JSONResponse
 from models import input_models
+from models.ai_models import ParsedResume
 
 router = APIRouter(
     prefix = "/account",
@@ -33,6 +35,18 @@ async def input_tex_update(request:Request, input_tex: UploadFile = File(...)):
     file["filename"] = input_tex.filename
     file["content"] = await input_tex.read()
     return update_input_tex(request.state.logged_in_user, file)
+
+@router.post("/updateProfile")
+def profile_update(request:Request, input: input_models.ProfileJson):
+    """Stores the form itself, so it is the same on every device the account is
+    used from."""
+    return update_profile(request.state.logged_in_user, input.profile)
+
+@router.post("/readResume", response_model=ParsedResume)
+def resume_read(input: input_models.ResumeText):
+    """Reads a resume the candidate already has, so the form starts filled in
+    rather than empty."""
+    return read_resume_from_text(input.text)
 
 @router.get("/listTexFiles")
 def tex_files_list(request:Request):
