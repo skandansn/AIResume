@@ -75,19 +75,17 @@ def verify_resume_content_format(resume_content):
 
     resume_content_list = resume_content.split("\n")
 
+    # either section may be empty. a career changer with no projects and a
+    # student with no jobs both need a resume, so only the pair being empty is
+    # a problem: there would be nothing to tailor
     experience_section = get_named_section_from_ai_response(resume_content_list, "ExperienceSectionStart", "ExperienceSectionEnd")
-    if len(experience_section) == 0:
-        raise HTTPException(status_code=400, detail="Experience section cannot be empty")
-
     projects_section = get_named_section_from_ai_response(resume_content_list, "ProjectsSectionStart", "ProjectsSectionEnd")
-    if len(projects_section) == 0:
-        raise HTTPException(status_code=400, detail="Projects section cannot be empty")
 
     section_items = []
     split_section_into_section_items(section_items, experience_section)
     split_section_into_section_items(section_items, projects_section)
 
     if len(section_items) == 0:
-        raise HTTPException(status_code=400, detail="Experience and Projects sections cannot be empty")
+        raise HTTPException(status_code=400, detail="Please add at least one role or one project")
 
     return len(section_items) + 1 # +1 for skills section

@@ -133,6 +133,9 @@ def render_resume_sections_for_prompt(parsed):
     parts += [f"{group['category']}: {group['values']}" for group in parsed["skills"]]
 
     for name in ("experience", "projects"):
+        if not parsed[name]:
+            continue
+
         parts.append("")
         parts.append(f"{name.capitalize()}:")
         for index, block in enumerate(parsed[name], 1):

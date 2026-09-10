@@ -244,3 +244,92 @@ def test_templates_saved_before_the_storage_move_are_flagged():
     assert described[1]["has_content"] is True
     # the .tex itself never goes back to the client
     assert "content" not in described[1]
+
+
+# ------------------------------------------------------- optional sections
+
+CONTENT_WITHOUT_PROJECTS = """SkillsSectionStart
+
+Languages: Python, Go
+
+SkillsSectionEnd
+
+ExperienceSectionStart
+
+Acme Corp - Senior Engineer:
+Migrated billing to Go.
+
+ExperienceSectionEnd
+
+ProjectsSectionStart
+
+ProjectsSectionEnd
+"""
+
+
+def test_a_resume_with_no_projects_is_accepted():
+    from services.account import verify_resume_content_format
+
+    # one experience block plus the skills section
+    assert verify_resume_content_format(CONTENT_WITHOUT_PROJECTS) == 2
+
+
+def test_a_resume_with_only_projects_is_accepted():
+    """A student with no jobs yet still gets a resume."""
+    from services.account import verify_resume_content_format
+
+    content = """SkillsSectionStart
+
+Languages: Python, Go
+
+SkillsSectionEnd
+
+ExperienceSectionStart
+
+ExperienceSectionEnd
+
+ProjectsSectionStart
+
+Trailmix:
+Built a trail finding app used by 800 hikers.
+
+ProjectsSectionEnd
+"""
+
+    assert verify_resume_content_format(content) == 2
+
+
+def test_a_resume_with_neither_is_rejected():
+    from services.account import verify_resume_content_format
+
+    empty = """SkillsSectionStart
+
+Languages: Python
+
+SkillsSectionEnd
+
+ExperienceSectionStart
+
+ExperienceSectionEnd
+
+ProjectsSectionStart
+
+ProjectsSectionEnd
+"""
+
+    with pytest.raises(HTTPException) as caught:
+        verify_resume_content_format(empty)
+
+    assert caught.value.status_code == 400
+    assert "at least one role or one project" in caught.value.detail
+
+
+def test_empty_sections_are_left_out_of_the_prompt():
+    parsed = parse_resume_sections(CONTENT_WITHOUT_PROJECTS)
+
+    assert parsed["projects"] == []
+
+    rendered = render_resume_sections_for_prompt(parsed)
+
+    assert "Experience:" in rendered
+    assert "Projects:" not in rendered

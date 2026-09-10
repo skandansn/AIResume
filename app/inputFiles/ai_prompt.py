@@ -91,7 +91,9 @@ def build_tailor_prompt(job_description, keywords, resume_sections, block_counts
 
     sections.append(
         f"\nReturn exactly {block_counts['experience']} experience block(s) and "
-        f"{block_counts['projects']} project block(s), in the given order, with the given headings."
+        f"{block_counts['projects']} project block(s), in the given order, with the given headings. "
+        "A count of zero means that section is empty and must stay empty: return an empty list for it "
+        "rather than inventing anything to fill it."
     )
 
     sections.append("\nThe candidate's current resume:\n" + resume_sections)
