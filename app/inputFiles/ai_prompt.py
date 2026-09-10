@@ -8,13 +8,20 @@ These rules are absolute:
 
 1) Never invent experience. Do not add a company, job title, date, degree,
    certification or metric that is not already in the resume.
-2) Only work a keyword into a bullet point when the work already described there
-   plausibly involved it. A payments API bullet can be described as REST or
-   backend work; it cannot become Kubernetes work because the posting mentions
-   Kubernetes.
-3) When a keyword cannot be supported honestly, leave it out and record it in
-   keywords_skipped with a short reason. A shorter honest resume beats a longer
-   dishonest one. Leaving keywords out is a valid, expected outcome.
+2) Skills reach you in two kinds, and they are not treated the same.
+   Confirmed skills are ones the candidate has told you they have. Their word is
+   the evidence: work every one into the bullet point it fits best, even when
+   that bullet does not mention it yet. You may reframe the work to name the
+   technology. You may not invent a new achievement, employer or number.
+   Suggested skills come from the posting and the candidate has not confirmed
+   them. Use one only when the work already described plausibly involved it. A
+   payments API bullet can be called REST or backend work; it cannot become
+   Kubernetes work because the posting mentions Kubernetes.
+3) When a suggested skill cannot be supported honestly, leave it out and record
+   it in keywords_skipped with a short reason. A shorter honest resume beats a
+   dishonest one. Leaving suggested skills out is expected.
+   Never skip a confirmed skill for want of evidence. The candidate is the
+   evidence, and it is their resume to stand behind.
 4) Rewrite a whole bullet point so it reads naturally in one voice. Never staple
    keywords onto the end of an existing sentence, and never produce a list of
    technologies pretending to be a sentence.
@@ -73,15 +80,25 @@ Work in this order:
 """
 
 
-def build_tailor_prompt(job_description, keywords, resume_sections, block_counts):
+def build_tailor_prompt(job_description, confirmed, suggested, resume_sections, block_counts):
     """Assembles the tailoring prompt. Keeping the job posting in this call lets
     the model tell a central requirement from an incidental mention, which a bare
     keyword list cannot express."""
 
     sections = [tailor_resume_prompt]
 
-    if keywords:
-        sections.append("\nTarget skills, in priority order:\n" + "\n".join(f"- {keyword}" for keyword in keywords))
+    if confirmed:
+        sections.append(
+            "\nConfirmed skills. The candidate has told you they have these, so every one must appear:\n"
+            + "\n".join(f"- {keyword}" for keyword in confirmed)
+        )
+
+    if suggested:
+        sections.append(
+            "\nSuggested skills, taken from the posting and not confirmed. Use only the ones their work already "
+            "supports, and report the rest as skipped:\n"
+            + "\n".join(f"- {keyword}" for keyword in suggested)
+        )
 
     if job_description and job_description.strip():
         sections.append(
@@ -112,11 +129,16 @@ def build_avoid_instruction(ignore_keywords):
 
 
 def build_required_instruction(mandatory_keywords):
+    """Typed in by hand, so this is the candidate insisting. Refusing to name a
+    skill someone says they have is not honesty, it is overruling them about
+    their own experience."""
     if not mandatory_keywords or not mandatory_keywords.strip():
         return ""
 
     return (
-        "\nThe candidate has confirmed they can defend these skills, so include them if the resume supports them at all: "
+        "\nThe candidate typed these in themselves, so they are not optional. Every one must appear in the "
+        "finished resume, in the bullet point it fits best, reframing that work to name the technology where "
+        "needed. Never report one of these as skipped: "
         + mandatory_keywords.strip()
     )
 
