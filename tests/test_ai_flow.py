@@ -194,3 +194,93 @@ def test_extract_keywords_needs_a_posting():
         ai_service.extract_keywords_from_job_description("   ")
 
     assert caught.value.status_code == 400
+
+
+# --------------------------------------- the candidate's word beats the model's
+
+@needs_pdflatex
+def test_a_skill_the_candidate_insists_on_is_never_reported_as_skipped(canned, monkeypatch):
+    """The model may decide a skill is unsupported. If the candidate typed it in
+    themselves, that decision is not the model's to make."""
+    from models.ai_models import SkippedKeyword, TailoredResume
+
+    def stubborn(prompt, schema, system_instruction=None, attempts=2):
+        if schema is TailoredResume:
+            result = tailored_resume()
+            result.keywords_skipped = [
+                SkippedKeyword(keyword="Terraform", reason="Nothing supports this")
+            ]
+            return result
+        return ExtractedKeywords(keywords=["Terraform"])
+
+    monkeypatch.setattr(ai_service, "call_ai_for_model", stubborn)
+
+    _, _, report = generate(keywords=Keywords(optional_keywords=False, mandatory_keywords="Terraform"))
+
+    assert report.skipped == []
+    assert "Terraform" in report.missing
+
+
+@needs_pdflatex
+def test_confirmed_and_suggested_skills_are_labelled_differently(canned):
+    generate(approved=["Kubernetes"])
+
+    prompt = canned[-1]["prompt"]
+
+    assert "Confirmed skills" in prompt
+    assert "- Kubernetes" in prompt
+    assert "Suggested skills" not in prompt
+
+
+@needs_pdflatex
+def test_skills_the_model_chose_are_marked_as_suggested(canned):
+    generate()
+
+    prompt = canned[-1]["prompt"]
+
+    assert "Suggested skills" in prompt
+    assert "Confirmed skills" not in prompt
+
+
+# ------------------------------------------------- the model call itself failing
+
+def test_a_dropped_connection_is_retried_then_reported_plainly(monkeypatch):
+    """The link to the model drops now and then. That is not the caller's fault
+    and should not surface as an internal error."""
+    import httpx
+    from models.ai_models import ExtractedKeywords as Schema
+
+    calls = []
+
+    def always_drops(*args, **kwargs):
+        calls.append(1)
+        raise httpx.RemoteProtocolError("Server disconnected without sending a response.")
+
+    monkeypatch.setattr(ai_service, "_client", lambda: type("C", (), {"models": type("M", (), {"generate_content": staticmethod(always_drops)})()})())
+    monkeypatch.setattr(ai_service, "RETRY_PAUSE_SECONDS", 0)
+
+    with pytest.raises(HTTPException) as caught:
+        ai_service.call_ai_for_model("prompt", Schema)
+
+    assert len(calls) == 2, "should have been tried again before giving up"
+    assert caught.value.status_code == 502
+    assert "did not respond" in caught.value.detail
+
+
+def test_a_dropped_connection_that_recovers_is_not_surfaced(monkeypatch):
+    import httpx
+    from models.ai_models import ExtractedKeywords as Schema
+
+    attempts = []
+
+    def drops_once(*args, **kwargs):
+        attempts.append(1)
+        if len(attempts) == 1:
+            raise httpx.RemoteProtocolError("Server disconnected without sending a response.")
+        return type("R", (), {"parsed": Schema(keywords=["Go"]), "text": ""})()
+
+    monkeypatch.setattr(ai_service, "_client", lambda: type("C", (), {"models": type("M", (), {"generate_content": staticmethod(drops_once)})()})())
+    monkeypatch.setattr(ai_service, "RETRY_PAUSE_SECONDS", 0)
+
+    assert ai_service.call_ai_for_model("prompt", Schema).keywords == ["Go"]
+    assert len(attempts) == 2

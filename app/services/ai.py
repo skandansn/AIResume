@@ -1,4 +1,8 @@
+import time
+
+import httpx
 from google import genai
+from google.genai import errors as genai_errors
 from google.genai import types
 from fastapi import HTTPException
 from pydantic import ValidationError
@@ -19,6 +23,7 @@ from .firebase_utils import firebase_get_user_from_firestore
 TEMPERATURE = 0.3
 SEED = 7
 REQUEST_TIMEOUT_MS = 120_000
+RETRY_PAUSE_SECONDS = 1.5
 
 def _client():
     return genai.Client(
@@ -40,11 +45,15 @@ def call_ai_and_get_response_text(prompt, system_instruction=None):
     return response.text
 
 def call_ai_for_model(prompt, schema, system_instruction=None, attempts=2):
-    """Generation with a response schema, retried once if the model returns
-    something that does not fit it."""
+    """Generation with a response schema, retried if the model returns something
+    that does not fit it, or if the call to the model does not complete."""
     last_error = None
+    unusable = "The AI returned something unusable. Please try again."
 
     for attempt in range(attempts):
+        if attempt > 0:
+            time.sleep(RETRY_PAUSE_SECONDS)
+
         try:
             response = _client().models.generate_content(
                 model=settings.gemini_model,
@@ -66,11 +75,14 @@ def call_ai_for_model(prompt, schema, system_instruction=None, attempts=2):
         except (ValidationError, ValueError) as e:
             last_error = e
             logger.error("model response did not fit %s on attempt %s: %s", schema.__name__, attempt + 1, e)
+        except (httpx.TransportError, genai_errors.ServerError) as e:
+            # the connection to the model drops often enough to be worth riding
+            # out, and it says nothing about the request itself
+            last_error = e
+            unusable = "The AI service did not respond. Please try again in a moment."
+            logger.error("call to the model failed on attempt %s: %s", attempt + 1, e)
 
-    raise HTTPException(
-        status_code=502,
-        detail="The AI returned something unusable. Please try again."
-    ) from last_error
+    raise HTTPException(status_code=502, detail=unusable) from last_error
 
 def extract_keywords_from_job_description(description):
     """The skills a posting screens for, so the candidate can confirm which ones
@@ -118,14 +130,20 @@ def generate_keywords_matched_resume(user, description, input_keywords, tex_file
 
     parsed = parse_resume_sections(user_data.get("resume").get("content"))
 
-    # the candidate's own picks win; otherwise let the model read the posting
-    keywords = [k.strip() for k in (approved_keywords or []) if k and k.strip()]
-    if not keywords and input_keywords.optional_keywords:
-        keywords = extract_keywords_from_job_description(description)
+    # ticking a skill is the candidate saying they have it, so those are taken at
+    # their word. skills the model picks out of the posting still have to be
+    # supported by what the resume already describes.
+    confirmed = [k.strip() for k in (approved_keywords or []) if k and k.strip()]
+    suggested = []
+    if not confirmed and input_keywords.optional_keywords:
+        suggested = extract_keywords_from_job_description(description)
+
+    keywords = confirmed + suggested
 
     prompt = ai_prompts.build_tailor_prompt(
         job_description=description,
-        keywords=keywords,
+        confirmed=confirmed,
+        suggested=suggested,
         resume_sections=render_resume_sections_for_prompt(parsed),
         block_counts={"experience": len(parsed["experience"]), "projects": len(parsed["projects"])},
     )
@@ -142,11 +160,16 @@ def generate_keywords_matched_resume(user, description, input_keywords, tex_file
     pdf = write_resume_from_tailored(tailored, resume_names, user)
 
     # what the candidate asked for by hand counts towards coverage too
-    checked = list(keywords)
-    if input_keywords.mandatory_keywords:
-        checked += [k.strip() for k in input_keywords.mandatory_keywords.split(",") if k.strip()]
+    by_hand = [k.strip() for k in (input_keywords.mandatory_keywords or "").split(",") if k.strip()]
+    checked = list(keywords) + by_hand
 
-    report = build_coverage_report(pdf, checked, tailored.keywords_skipped)
+    # a skill the candidate vouched for is never "left out on purpose". if one
+    # did not make it, that is a gap they should see, not an excuse they read.
+    # skills the model suggested itself may still be skipped with a reason.
+    insisted = {k.lower() for k in confirmed + by_hand}
+    skipped = [item for item in tailored.keywords_skipped if item.keyword.strip().lower() not in insisted]
+
+    report = build_coverage_report(pdf, checked, skipped)
 
     return pdf, output_resume_name, report
 
