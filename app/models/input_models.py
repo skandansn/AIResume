@@ -17,6 +17,12 @@ class JobDescription(BaseModel):
 class JobDescriptionKeywords(BaseModel):
     description : str
 
+class ProfileJson(BaseModel):
+    profile : str
+
+class ResumeText(BaseModel):
+    text : str
+
 class SignUp(BaseModel):
     email : str
     password : str

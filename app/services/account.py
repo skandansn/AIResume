@@ -20,6 +20,21 @@ def update_resume_content(user, resume_content):
     firebase_update_resume_content(user, resume_content, section_items_count)
     return True
 
+# the form as the browser holds it. the resume text and the template are both
+# derived from it and neither can be turned back into it, so without this the
+# only copy would live in one browser
+MAX_PROFILE_CHARACTERS = 200000
+
+def update_profile(user, profile_json):
+    if not profile_json or not profile_json.strip():
+        raise HTTPException(status_code=400, detail="Profile cannot be empty")
+
+    if len(profile_json) > MAX_PROFILE_CHARACTERS:
+        raise HTTPException(status_code=400, detail="That is too much detail to store. Please shorten your resume.")
+
+    firebase_update_user_document(user, {"profile": profile_json})
+    return True
+
 def get_user_data(user):
     data = firebase_get_user_from_firestore(user)
     if data is None:
